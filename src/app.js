@@ -11,6 +11,7 @@ const startServer = async () => {
     try {
         await connectDB();
 
+        //save an user to the database
         app.post("/signup", async(req, res) => {
             try {
                 const {firstName, lastName, email, password, age, gender} = req.body;
@@ -38,6 +39,8 @@ const startServer = async () => {
             }
         });
 
+
+        //fetch an user from database by email
        app.get("/getUser", async (req, res) => {
             try {
                 const userEmail = req.query.email;
@@ -67,6 +70,7 @@ const startServer = async () => {
             }
        });
 
+       //fetch all user from the database
        app.get("/feed", async (req, res) => {
             try {
                 const fetchedAllUsers = await User.find({});
@@ -90,6 +94,7 @@ const startServer = async () => {
             }
        });
 
+       //delete a single user by (_id)
        app.delete("/user", async (req, res) => {
             try {
 
@@ -105,7 +110,7 @@ const startServer = async () => {
                 res.json({
                     message: "User deleted successfully...",
                 });
-                
+
             } catch (error) {
                 console.error("Internal server error", error.message);
                 res.status(500).json({
@@ -113,6 +118,33 @@ const startServer = async () => {
                     error: error.message
                 });
             }
+       });
+
+       //update user details
+       app.patch("/user", async (req, res) => {
+        try {
+            const userId = req.query.userId;
+            if(!userId){
+                return res.status(400).json({
+                    message: "Must send the userId...",
+                });
+            }
+
+            const dataNeedToBeUpdated = req.body;
+
+            const updatedUser = await User.findByIdAndUpdate(userId,dataNeedToBeUpdated);
+
+            res.json({
+                message : "User updated successfully..."
+            });
+            
+        } catch (error) {
+            console.error("Internal server error", error.message);
+                res.status(500).json({
+                    message: "Internal server error",
+                    error: error.message
+                });
+        }
        })
 
         app.listen(PORT, () => {
