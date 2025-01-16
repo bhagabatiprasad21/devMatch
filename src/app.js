@@ -80,7 +80,7 @@ const startServer = async () => {
                     message:" Here are all the users ...",
                     users: fetchedAllUsers
                 });
-                 
+
             } catch (error) {
                 console.error("Internal serever error", error.message);
                 res.status(500).json({
@@ -89,6 +89,31 @@ const startServer = async () => {
                 });
             }
        });
+
+       app.delete("/user", async (req, res) => {
+            try {
+
+                const userId = req.query.userId;
+                if(!userId){
+                    return res.status(400).json({
+                        message: "User Id is required to search the user ... "
+                    });
+                }
+
+                const deletedUser = await User.findByIdAndDelete(userId);
+
+                res.json({
+                    message: "User deleted successfully...",
+                });
+                
+            } catch (error) {
+                console.error("Internal server error", error.message);
+                res.status(500).json({
+                    message: "Internal server error",
+                    error: error.message
+                });
+            }
+       })
 
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
