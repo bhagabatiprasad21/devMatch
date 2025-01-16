@@ -22,7 +22,7 @@ const startServer = async () => {
                     email,
                     password,
                     age,
-                    gender,
+                    gender, 
                 });
                 const newlyCreatedUser = await user.save();
                 res.status(201).json({
@@ -37,6 +37,58 @@ const startServer = async () => {
                 });
             }
         });
+
+       app.get("/getUser", async (req, res) => {
+            try {
+                const userEmail = req.query.email;
+                if(!userEmail){
+                    return res.status(400).json({
+                        message: "Email is required as a query parameter!!",
+                    });
+                }
+                const fetchedUser = await User.find({email: userEmail});
+
+                if(fetchedUser.length === 0){
+                        return res.status(404).json({
+                            message: "User not found!!!",
+                        });
+                }
+
+                res.json({
+                    message: "User is successfully fetched for you...",
+                    user: fetchedUser
+                });
+            } catch (error) {
+                console.error("Internal server error", error.message);
+                res.status(500).json({
+                    message: "Internal server error",
+                    error: error.message
+                });
+            }
+       });
+
+       app.get("/feed", async (req, res) => {
+            try {
+                const fetchedAllUsers = await User.find({});
+
+                if(fetchedAllUsers.length === 0){
+                    return res.status(404).json({
+                        message: "Users not found !!",
+                    });
+                }
+                res.json({
+                    message:" Here are all the users ...",
+                    users: fetchedAllUsers
+                });
+                 
+            } catch (error) {
+                console.error("Internal serever error", error.message);
+                res.status(500).json({
+                    message: "Internal server error",
+                    error: error.message
+                });
+            }
+       });
 
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
